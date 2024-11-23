@@ -1,29 +1,68 @@
-function Header() {
-  const scrollToTop = () => {
+import props from "prop-types";
+
+function Header({ style }) {
+  const handleScroll = (sectionId) => {
+    const section = document.querySelector(sectionId);
+
+    if (!section) {
+      console.warn(`Section with id ${sectionId} not found.`);
+      return;
+    }
+
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const sectionHeight = section.offsetHeight;
+
+    let scrollPosition = sectionTop;
+
+    // Handle "Contact" section behavior specifically
+    if (sectionId === "#contact") {
+      const viewportHeight = window.innerHeight;
+      const extraOffset = sectionHeight + viewportHeight;
+      scrollPosition += extraOffset;
+    }
+
     window.scrollTo({
-      top: 0,
+      top: scrollPosition,
       behavior: "smooth",
     });
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-primary z-10  p-4">
+    <header
+      className={`fixed top-0 left-0 right-0 z-20 p-4 ${style.backgroundColor} ${style.textColor}`}
+    >
       <nav className="flex justify-around">
-        <a href="#home" onClick={scrollToTop} className="hover:text-blue-400">
+        <button
+          onClick={() => handleScroll("#home")}
+          className="hover:text-blue-400"
+        >
           Jonne
-        </a>
-        <a href="#about" className="hover:text-blue-400">
+        </button>
+        <button
+          onClick={() => handleScroll("#about")}
+          className="hover:text-blue-400"
+        >
           About
-        </a>
-        <a href="#projects" className="hover:text-blue-400">
+        </button>
+        <button
+          onClick={() => handleScroll("#projects")}
+          className="hover:text-blue-400"
+        >
           Projects
-        </a>
-        <a href="#contact" className="hover:text-blue-400">
+        </button>
+        <button
+          onClick={() => handleScroll("#contact")}
+          className="hover:text-blue-400"
+        >
           Contact
-        </a>
+        </button>
       </nav>
     </header>
   );
 }
+
+Header.propTypes = {
+  style: props.object,
+};
 
 export default Header;
