@@ -1,7 +1,44 @@
-import props from "prop-types";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 function Header({ style }) {
-  const handleScroll = (sectionId) => {
+  const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    const sections = document.querySelectorAll("section");
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 10;
+
+      let activeId = "";
+
+      sections.forEach((section) => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+
+        // Add extra offset for the "contact" section
+        let sectionBottom = sectionTop + sectionHeight;
+        if (section.id === "contact") {
+          sectionBottom += 100; // Add offset to account for sticky behavior
+        }
+
+        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+          activeId = section.id;
+        }
+      });
+
+      setActiveSection(activeId);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const scrollToSection = (sectionId) => {
     const section = document.querySelector(sectionId);
 
     if (!section) {
@@ -17,7 +54,7 @@ function Header({ style }) {
     // Handle "Contact" section behavior specifically
     if (sectionId === "#contact") {
       const viewportHeight = window.innerHeight;
-      const extraOffset = sectionHeight + viewportHeight;
+      const extraOffset = sectionHeight + viewportHeight + 1000;
       scrollPosition += extraOffset;
     }
 
@@ -29,30 +66,38 @@ function Header({ style }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-20 p-4 ${style.backgroundColor} ${style.textColor}`}
+      className={`fixed top-0 left-0 right-0 z-20 p-4 container mx-auto ${style.backgroundColor} ${style.textColor}`}
     >
       <nav className="flex justify-around">
         <button
-          onClick={() => handleScroll("#home")}
-          className="hover:text-blue-400"
+          onClick={() => scrollToSection("#top")}
+          className={`hover:underline decoration-1 ${
+            activeSection === "home" ? "underline decoration-2" : ""
+          }`}
         >
-          Jonne
+          Home
         </button>
         <button
-          onClick={() => handleScroll("#about")}
-          className="hover:text-blue-400"
+          onClick={() => scrollToSection("#about")}
+          className={`hover:underline decoration-1 ${
+            activeSection === "about" ? "underline decoration-2" : ""
+          }`}
         >
           About
         </button>
         <button
-          onClick={() => handleScroll("#projects")}
-          className="hover:text-blue-400"
+          onClick={() => scrollToSection("#projects")}
+          className={`hover:underline decoration-1 ${
+            activeSection === "projects" ? "underline decoration-2" : ""
+          }`}
         >
           Projects
         </button>
         <button
-          onClick={() => handleScroll("#contact")}
-          className="hover:text-blue-400"
+          onClick={() => scrollToSection("#contact")}
+          className={`hover:underline decoration-1 ${
+            activeSection === "contact" ? "underline decoration-2" : ""
+          }`}
         >
           Contact
         </button>
@@ -62,7 +107,7 @@ function Header({ style }) {
 }
 
 Header.propTypes = {
-  style: props.object,
+  style: PropTypes.object,
 };
 
 export default Header;
